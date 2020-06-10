@@ -1,19 +1,30 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import React from 'react'
-import {
-  Image,
-  KeyboardAvoidingView,
-  ScrollView,
-  View,
-  Platform,
-} from 'react-native'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useCallback, useEffect, useState } from 'react'
+import { View } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Feather'
-
 import { useAuth } from '../../hooks/auth'
-
-import logoImg from '../../assets/logo.png'
-
-import { Container, Title, SignOutButton, SignOutButtonText } from './styles'
+import api from '../../services/api'
+import { Provider } from './types'
+import {
+  Container,
+  Title,
+  Header,
+  HeaderTitle,
+  UserName,
+  ProfileButton,
+  UserAvatar,
+  ProvidersList,
+  ProvidersListTitle,
+  ProviderContainer,
+  ProviderAvatar,
+  ProviderInfo,
+  ProviderName,
+  ProviderMeta,
+  ProviderMetaText,
+} from './styles'
 
 interface SignInFormData {
   email: string
@@ -21,31 +32,73 @@ interface SignInFormData {
 }
 
 const Dashboard: React.FC = () => {
-  const { signOut } = useAuth()
+  const [providers, setProviders] = useState<Provider[]>([])
+  const { signOut, user } = useAuth()
+  const { navigate } = useNavigation()
+
+  useEffect(() => {
+    async function loadProviders() {
+      const response = await api.get('providers')
+      setProviders(response.data)
+    }
+    loadProviders()
+  }, [])
+
+  const navigateToProfile = useCallback(() => {
+    // navigate('Profile')
+    signOut()
+  }, [signOut])
+
+  const navigateToCreateAppointment = useCallback(
+    (provider_id: string) => {
+      navigate('CreateAppointment', { provider_id })
+    },
+    [navigate],
+  )
 
   return (
     <>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        enabled
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ flex: 1 }}
-        >
-          <Container>
-            <Image source={logoImg} />
-            <View>
-              <Title>DASHBORAD</Title>
-            </View>
-          </Container>
-        </ScrollView>
-      </KeyboardAvoidingView>
-      <SignOutButton onPress={signOut}>
-        <Icon name="log-out" size={20} color="#ff9000" />
-        <SignOutButtonText>Sair da conta</SignOutButtonText>
-      </SignOutButton>
+      <Container>
+        <Header>
+          <HeaderTitle>
+            Bem vindo,
+            {'\n'}
+            <UserName>{user.name}</UserName>
+          </HeaderTitle>
+          <ProfileButton onPress={navigateToProfile}>
+            <UserAvatar source={{ uri: user.avatar_url }} />
+          </ProfileButton>
+        </Header>
+        <ProvidersList
+          data={providers}
+          ListEmptyComponent={<View />}
+          ListHeaderComponent={
+            <ProvidersListTitle>Cabeleireiros</ProvidersListTitle>
+          }
+          keyExtractor={provider => provider.id}
+          renderItem={({ item: provider }) => (
+            <ProviderContainer
+              onPress={() => navigateToCreateAppointment(provider.id)}
+            >
+              <ProviderAvatar source={{ uri: provider.avatar_url }} />
+              <ProviderInfo>
+                <ProviderName>{provider.name}</ProviderName>
+                <ProviderMeta>
+                  <Icon name="calendar" size={14} color="#ff9000" />
+                  <ProviderMetaText>Segunda a Sexta</ProviderMetaText>
+                </ProviderMeta>
+                <ProviderMeta>
+                  <Icon name="clock" size={14} color="#ff9000" />
+                  <ProviderMetaText>8:00 a 18:00</ProviderMetaText>
+                </ProviderMeta>
+              </ProviderInfo>
+            </ProviderContainer>
+          )}
+        />
+        <View>
+          <Title>DASHBORAD</Title>
+        </View>
+      </Container>
     </>
   )
 }

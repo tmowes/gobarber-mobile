@@ -60,7 +60,7 @@ const SignUp: React.FC = () => {
         await api.post('/users', data)
         Alert.alert(
           'Cadastro realizado com sucesso',
-          'Você já pode fazere login na aplicação',
+          'Você já pode fazer login na aplicação',
         )
         navigation.navigate('SignIn')
       } catch (err) {

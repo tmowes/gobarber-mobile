@@ -27,6 +27,7 @@
     "react/prop-types": "off",
     "react/jsx-props-no-spreading": "off",
     "no-empty-function": "off",
+    "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-empty-function": ["error"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
