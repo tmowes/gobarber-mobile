@@ -3,3 +3,9 @@ export interface Provider {
   name: string
   avatar_url: string
 }
+export interface ProviderContainerProps {
+  selected: boolean
+}
+export interface ProviderNameProps {
+  selected: boolean
+}

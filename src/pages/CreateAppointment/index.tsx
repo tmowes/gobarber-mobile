@@ -19,8 +19,9 @@ import {
   UserAvatar,
   ProvidersListContainer,
   ProvidersList,
-  ProviderInfo,
+  ProviderAvatar,
   ProviderName,
+  ProviderContainer,
 } from './styles'
 
 interface SignInFormData {
@@ -38,6 +39,7 @@ const CreateAppointment: React.FC = () => {
   const { provider_id } = route.params as RouteParams
   const { signOut, user } = useAuth()
   const [providers, setProviders] = useState<Provider[]>([])
+  const [selectedProvider, setSelectedProvider] = useState(provider_id)
 
   useEffect(() => {
     async function loadProviders() {
@@ -54,6 +56,10 @@ const CreateAppointment: React.FC = () => {
   const navigateToProfile = useCallback(() => {
     navigate('Profile')
   }, [navigate])
+
+  const handleSelectProvider = useCallback((selectedProvider_id: string) => {
+    setSelectedProvider(selectedProvider_id)
+  }, [])
 
   return (
     <>
@@ -74,14 +80,20 @@ const CreateAppointment: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             keyExtractor={provider => provider.id}
             renderItem={({ item: provider }) => (
-              <ProviderInfo>
-                <ProviderName>{provider.name}</ProviderName>
-              </ProviderInfo>
+              <ProviderContainer
+                selected={provider.id === selectedProvider}
+                onPress={() => handleSelectProvider(provider.id)}
+              >
+                <ProviderAvatar source={{ uri: provider.avatar_url }} />
+                <ProviderName selected={provider.id === selectedProvider}>
+                  {provider.name}
+                </ProviderName>
+              </ProviderContainer>
             )}
           />
         </ProvidersListContainer>
         <View>
-          <Title>{provider_id}</Title>
+          <Title>{selectedProvider}</Title>
         </View>
       </Container>
     </>
