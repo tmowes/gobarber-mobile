@@ -1,6 +1,7 @@
 {
   "env": {
-    "es6": true
+    "es6": true,
+    "browser": true
   },
   "extends": [
     "plugin:react/recommended",
@@ -28,7 +29,9 @@
     "react/jsx-props-no-spreading": "off",
     "no-empty-function": "off",
     "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
     "import/no-duplicates": "off",
+    "no-unused-expressions": "off",
     "@typescript-eslint/no-empty-function": ["error"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

@@ -1,7 +1,5 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useRef } from 'react'
 import {
   KeyboardAvoidingView,
@@ -16,6 +14,7 @@ import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
 import * as Yup from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
+import ImagePicker from 'react-native-image-picker'
 
 import getValidationErrors from '../../utils/getValidationErrors'
 import api from '../../services/api'
@@ -41,7 +40,7 @@ const Profile: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null)
   const ConfirmpasswordInputRef = useRef<TextInput>(null)
 
-  const handleSignUp = useCallback(
+  const handleProfileUpdate = useCallback(
     async (data: ProfileFormData) => {
       try {
         formRef.current?.setErrors({})
@@ -107,6 +106,35 @@ const Profile: React.FC = () => {
     [goBack, updateUser],
   )
 
+  const handleUpdateAvatar = useCallback(() => {
+    ImagePicker.showImagePicker(
+      {
+        title: 'Selecione um avatar',
+        chooseFromLibraryButtonTitle: 'Escolher da galeria',
+        takePhotoButtonTitle: 'Usar câmera',
+        cancelButtonTitle: 'Cancelar',
+      },
+      updateAvatar => {
+        if (updateAvatar.didCancel) {
+          return
+        }
+        if (updateAvatar.error) {
+          Alert.alert('Erro ao atualizar seu avatar')
+          return
+        }
+        const data = new FormData()
+        data.append('avatar', {
+          type: 'image/jpeg',
+          name: `${user.id}.jpg`,
+          uri: updateAvatar.uri,
+        })
+        api.patch('users/avatar', data).then(responseAvatar => {
+          updateUser(responseAvatar.data)
+        })
+      },
+    )
+  }, [user.id, updateUser])
+
   const handleGoback = useCallback(() => {
     goBack()
   }, [goBack])
@@ -126,13 +154,17 @@ const Profile: React.FC = () => {
             <BackButton onPress={handleGoback}>
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
-            <UserAvatarButton>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{ uri: user.avatar_url }} />
             </UserAvatarButton>
             <View>
               <Title>Meu Perfil</Title>
             </View>
-            <Form initialData={user} ref={formRef} onSubmit={handleSignUp}>
+            <Form
+              initialData={user}
+              ref={formRef}
+              onSubmit={handleProfileUpdate}
+            >
               <Input
                 autoCapitalize="words"
                 name="name"
