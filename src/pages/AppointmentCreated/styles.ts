@@ -1,38 +1,36 @@
 import styled from 'styled-components/native'
-import { Platform } from 'react-native'
-import { getBottomSpace } from 'react-native-iphone-x-helper'
+import { RectButton } from 'react-native-gesture-handler'
 
 export const Container = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px;
+  padding: 0 32px;
 `
-
 export const Title = styled.Text`
-  font-size: 24px;
   color: #f4ede8;
+  font-size: 32px;
   font-family: 'RobotoSlab-Medium';
-  margin: 64px 0 24px;
+  text-align: center;
+  margin: 48px 0 16px;
 `
-export const SignOutButton = styled.TouchableOpacity`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #312e38;
-  flex-direction: row;
+export const Description = styled.Text`
+  color: #999591;
+  font-size: 16px;
+  font-family: 'RobotoSlab-Regular';
+  text-align: center;
+`
+export const OkButton = styled(RectButton)`
+  background: #ff9000;
   align-items: center;
   justify-content: center;
-
-  border-top-width: 1px;
-  border-color: #232129;
-  padding: 16px 0 ${8 + getBottomSpace()}px;
+  border-radius: 10px;
+  margin: 16px 0;
+  padding: 8px 32px;
 `
-
-export const SignOutButtonText = styled.Text`
-  color: #ff9000;
+export const OkButtonText = styled.Text`
+  color: #312e38;
   font-size: 18px;
   font-family: 'RobotoSlab-Medium';
-  margin-left: 16px;
+  text-align: center;
 `

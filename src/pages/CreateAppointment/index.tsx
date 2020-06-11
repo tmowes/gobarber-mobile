@@ -4,11 +4,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
-import { View, Platform, Alert } from 'react-native'
-import Icon from 'react-native-vector-icons/Feather'
-import { useRoute, useNavigation } from '@react-navigation/native'
+import { Platform, Alert } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import Icon from 'react-native-vector-icons/Feather'
 import { format } from 'date-fns'
+import { useRoute, useNavigation } from '@react-navigation/native'
 import { useAuth } from '../../hooks/auth'
 import api from '../../services/api'
 import { Provider } from './types'
@@ -115,7 +115,7 @@ const CreateAppointment: React.FC = () => {
   const handleCreateAppointment = useCallback(async () => {
     try {
       const date = new Date(selectedDate)
-      date.setHours(selectedHour + 3)
+      date.setHours(selectedHour)
       date.setMinutes(0)
       console.log('selectedProvider', selectedProvider)
       console.log('selectedDate', selectedDate)
@@ -130,7 +130,6 @@ const CreateAppointment: React.FC = () => {
       )
     }
   }, [selectedDate, selectedProvider, selectedHour, navigate])
-
   const morningAvailability = useMemo(() => {
     return availability
       .filter(({ hour }) => hour < 12)
@@ -153,6 +152,8 @@ const CreateAppointment: React.FC = () => {
         }
       })
   }, [availability])
+
+  // TODO: add date selected visual component on screen
 
   return (
     <>

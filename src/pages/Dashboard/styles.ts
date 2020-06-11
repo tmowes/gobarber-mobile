@@ -15,19 +15,18 @@ export const Container = styled.View`
   /* padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px; */
 `
 export const Header = styled.View`
-  padding: 24px;
-  padding-top: ${getStatusBarHeight() + 24}px;
+  padding: 16px 32px;
+  padding-top: ${getStatusBarHeight() + 16}px;
   background: #28262e;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 `
-// Header.displayName = 'DASHBOARD-HEADER'
 export const HeaderTitle = styled.Text`
   font-size: 24px;
   color: #f4ede8;
   font-family: 'RobotoSlab-Regular';
-  line-height: 28px;
+  line-height: 32px;
 `
 export const UserName = styled.Text`
   color: #ff9000;
@@ -40,22 +39,21 @@ export const UserAvatar = styled.Image`
   border-radius: 28px;
 `
 export const ProvidersList = styled(FlatList as new () => FlatList<Provider>)`
-  padding: 32px 24px 16px;
+  padding: 0 32px;
 `
 export const ProvidersListTitle = styled.Text`
   font-size: 24px;
   color: #f4ede8;
   font-family: 'RobotoSlab-Medium';
-  margin-bottom: 24px;
+  margin: 12px 0;
 `
-
 export const ProviderContainer = styled(RectButton)`
   flex-direction: row;
   align-items: center;
   background: #3e3b47;
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 16px;
+  margin: 8px 0;
 `
 export const ProviderAvatar = styled.Image`
   width: 72px;
