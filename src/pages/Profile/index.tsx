@@ -33,8 +33,8 @@ import { useAuth } from '../../hooks/auth'
 import { ProfileFormData } from './types'
 
 const Profile: React.FC = () => {
-  const { user } = useAuth()
-  const { navigate, goBack } = useNavigation()
+  const { user, updateUser } = useAuth()
+  const { goBack } = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const emailInputRef = useRef<TextInput>(null)
   const oldPasswordInputRef = useRef<TextInput>(null)
@@ -50,17 +50,48 @@ const Profile: React.FC = () => {
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail valido'),
-          password: Yup.string().min(6, 'No minimo 6 digitos'),
+          old_password: Yup.string(),
+          password: Yup.string().when('old_password', {
+            is: value => !!value.length,
+            then: Yup.string().required('Campo obrigatório'),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when('old_password', {
+              is: value => !!value.length,
+              then: Yup.string().required('Campo obrigatório'),
+              otherwise: Yup.string(),
+            })
+            .oneOf(
+              [Yup.ref('password'), null],
+              'Confirmação de senha incorreta',
+            ),
         })
         await schema.validate(data, {
           abortEarly: false,
         })
-        await api.post('/users', data)
-        Alert.alert(
-          'Perfil atualizado com sucesso',
-          'Você já pode fazer login na aplicação',
-        )
-        navigate('Dashboard')
+        const {
+          name,
+          email,
+          old_password,
+          password,
+          password_confirmation,
+        } = data
+        const formData = {
+          name,
+          email,
+          ...(old_password
+            ? {
+                old_password,
+                password,
+                password_confirmation,
+              }
+            : {}),
+        }
+        const response = await api.put('/profile', formData)
+        updateUser(response.data)
+        Alert.alert('Perfil atualizado com sucesso')
+        goBack()
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err)
@@ -68,12 +99,12 @@ const Profile: React.FC = () => {
           return
         }
         Alert.alert(
-          'Erro ao atualizar o perfil',
+          'Erro na atualização do perfil',
           'Ocorreu um erro ao atualizar o perfil, tente novamente .',
         )
       }
     },
-    [navigate],
+    [goBack, updateUser],
   )
 
   const handleGoback = useCallback(() => {
@@ -101,7 +132,7 @@ const Profile: React.FC = () => {
             <View>
               <Title>Meu Perfil</Title>
             </View>
-            <Form ref={formRef} onSubmit={handleSignUp}>
+            <Form initialData={user} ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
                 name="name"
