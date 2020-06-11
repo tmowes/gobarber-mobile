@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
-import { View, Platform } from 'react-native'
+import { View, Platform, Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/Feather'
 import { useRoute, useNavigation } from '@react-navigation/native'
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -36,6 +36,8 @@ import {
   SectionContent,
   Hour,
   HourText,
+  CreateAppointmentButton,
+  CreateAppointmentButtonText,
 } from './styles'
 
 interface AvailabilityItem {
@@ -93,7 +95,6 @@ const CreateAppointment: React.FC = () => {
   }, [])
   const handleSelectHour = useCallback((hour: number) => {
     setSelectedHour(hour)
-    // console.log(hour)
   }, [])
 
   const handleToggleDatePicker = useCallback(() => {
@@ -111,6 +112,25 @@ const CreateAppointment: React.FC = () => {
     },
     [],
   )
+  const handleCreateAppointment = useCallback(async () => {
+    try {
+      const date = new Date(selectedDate)
+      date.setHours(selectedHour + 3)
+      date.setMinutes(0)
+      console.log('selectedProvider', selectedProvider)
+      console.log('selectedDate', selectedDate)
+      console.log('selectedHour', selectedHour)
+      console.log('date', date)
+      await api.post('appointments', { provider_id: selectedProvider, date })
+      navigate('AppointmentCreated', { date: date.getTime() })
+    } catch (err) {
+      Alert.alert(
+        'Erro ao criar o agendamento',
+        'Ocorreu um erro ao criar o agendamento, tente novamente.',
+      )
+    }
+  }, [selectedDate, selectedProvider, selectedHour, navigate])
+
   const morningAvailability = useMemo(() => {
     return availability
       .filter(({ hour }) => hour < 12)
@@ -224,6 +244,9 @@ const CreateAppointment: React.FC = () => {
               </SectionContent>
             </Section>
           </Schedule>
+          <CreateAppointmentButton onPress={handleCreateAppointment}>
+            <CreateAppointmentButtonText>Agendar</CreateAppointmentButtonText>
+          </CreateAppointmentButton>
         </Content>
       </Container>
     </>

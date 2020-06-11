@@ -118,24 +118,16 @@ export const HourText = styled.Text<HourTextProps>`
   color: ${props => (props.selected ? '#232129' : '#f4ede8')};
   font-family: 'RobotoSlab-Regular';
 `
-
-export const SignOutButton = styled.TouchableOpacity`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #312e38;
-  flex-direction: row;
+export const CreateAppointmentButton = styled(RectButton)`
+  height: 50px;
+  background: #ff9000;
+  border-radius: 10px;
   align-items: center;
   justify-content: center;
-
-  border-top-width: 1px;
-  border-color: #232129;
+  margin: 0 24px 24px;
 `
-
-export const SignOutButtonText = styled.Text`
-  color: #ff9000;
+export const CreateAppointmentButtonText = styled.Text`
+  color: #232129;
   font-size: 18px;
   font-family: 'RobotoSlab-Medium';
-  margin-left: 16px;
 `
