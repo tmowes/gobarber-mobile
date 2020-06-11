@@ -3,7 +3,13 @@ import styled from 'styled-components/native'
 import { getStatusBarHeight } from 'react-native-iphone-x-helper'
 import { FlatList } from 'react-native'
 import { RectButton } from 'react-native-gesture-handler'
-import { Provider, ProviderContainerProps, ProviderNameProps } from './types'
+import {
+  Provider,
+  ProviderContainerProps,
+  ProviderNameProps,
+  HourProps,
+  HourTextProps,
+} from './types'
 
 export const Container = styled.View`
   flex: 1;
@@ -32,6 +38,8 @@ export const UserAvatar = styled.Image`
   height: 56px;
   border-radius: 28px;
 `
+export const Content = styled.ScrollView``
+
 export const ProvidersListContainer = styled.View`
   height: 112px;
 `
@@ -79,6 +87,36 @@ export const OpenDatePickerText = styled.Text`
   color: #232129;
   font-size: 16px;
   font-family: 'RobotoSlab-Medium';
+`
+
+export const Schedule = styled.View`
+  padding: 24px 0 16px;
+`
+export const Section = styled.View`
+  margin-bottom: 24px;
+`
+export const SectionTitle = styled.Text`
+  color: #999591;
+  font-size: 18px;
+  font-family: 'RobotoSlab-Regular';
+  margin: 0 24px 24px;
+`
+export const SectionContent = styled.ScrollView.attrs({
+  contentContainerStyle: { paddingHorizontal: 24 },
+  horizontal: true,
+  showsHorizontalScrollIndicator: false,
+})``
+export const Hour = styled(RectButton)<HourProps>`
+  padding: 12px;
+  background: ${props => (props.selected ? '#ff9000' : '#3e3b47')};
+  border-radius: 10px;
+  margin-right: 8px;
+  opacity: ${props => (props.available ? 1 : 0.3)};
+`
+export const HourText = styled.Text<HourTextProps>`
+  font-size: 16px;
+  color: ${props => (props.selected ? '#232129' : '#f4ede8')};
+  font-family: 'RobotoSlab-Regular';
 `
 
 export const SignOutButton = styled.TouchableOpacity`
