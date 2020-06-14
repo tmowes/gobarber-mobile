@@ -7,31 +7,7 @@ import React, {
 } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
 import api from '../services/api'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar_url: string
-}
-
-interface AuthStateData {
-  token: string
-  user: User
-}
-
-interface SignCredentials {
-  email: string
-  password: string
-}
-
-interface AuthContextData {
-  user: User
-  loading: boolean
-  signIn(credentials: SignCredentials): Promise<void>
-  signOut(): void
-  updateUser(user: User): Promise<void>
-}
+import { AuthContextData, AuthStateData, User } from './types'
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 
@@ -84,10 +60,8 @@ export const AuthProvider: React.FC = ({ children }) => {
       })
       await AsyncStorage.setItem('@Gobarber: user', JSON.stringify(user))
     },
-
     [setData, data.token],
   )
-
   return (
     <AuthContext.Provider
       value={{ user: data.user, signIn, signOut, loading, updateUser }}
@@ -99,7 +73,6 @@ export const AuthProvider: React.FC = ({ children }) => {
 
 export function useAuth(): AuthContextData {
   const context = useContext(AuthContext)
-
   if (!context) {
     throw new Error('Auth must be used within a AuthProvider')
   }

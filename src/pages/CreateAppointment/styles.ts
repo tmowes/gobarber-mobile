@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import styled from 'styled-components/native'
 import { getStatusBarHeight } from 'react-native-iphone-x-helper'
 import { FlatList } from 'react-native'
@@ -38,7 +37,6 @@ export const UserAvatar = styled.Image`
   border-radius: 28px;
 `
 export const Content = styled.ScrollView``
-
 export const ProvidersListContainer = styled.View`
   height: 112px;
 `
@@ -65,12 +63,23 @@ export const ProviderName = styled.Text<ProviderNameProps>`
   margin-left: 8px;
 `
 export const Calendar = styled.View``
-
-export const Title = styled.Text`
-  font-size: 24px;
+export const DateTitle = styled.Text`
+  font-size: 22px;
   color: #f4ede8;
   font-family: 'RobotoSlab-Medium';
   margin: 0 32px 16px;
+`
+export const ChooseAppointmentTitle = styled.Text`
+  font-size: 22px;
+  color: #f4ede8;
+  font-family: 'RobotoSlab-Medium';
+  margin: 0 32px 8px;
+`
+export const Title = styled.Text`
+  font-size: 22px;
+  color: #f4ede8;
+  font-family: 'RobotoSlab-Medium';
+  margin: 0 32px;
 `
 export const OpenDatePickerButton = styled(RectButton)`
   height: 46px;
@@ -82,7 +91,7 @@ export const OpenDatePickerButton = styled(RectButton)`
 `
 export const OpenDatePickerText = styled.Text`
   color: #232129;
-  font-size: 16px;
+  font-size: 18px;
   font-family: 'RobotoSlab-Medium';
 `
 export const Schedule = styled.View`
@@ -95,7 +104,7 @@ export const SectionTitle = styled.Text`
   color: #999591;
   font-size: 18px;
   font-family: 'RobotoSlab-Regular';
-  margin: 0 32px 32px;
+  margin: 16px 32px 16px;
 `
 export const SectionContent = styled.ScrollView.attrs({
   contentContainerStyle: { paddingHorizontal: 32 },
@@ -120,10 +129,10 @@ export const CreateAppointmentButton = styled(RectButton)`
   border-radius: 10px;
   align-items: center;
   justify-content: center;
-  margin: 0 24px 24px;
+  margin: 0 32px 32px;
 `
 export const CreateAppointmentButtonText = styled.Text`
   color: #232129;
-  font-size: 18px;
+  font-size: 20px;
   font-family: 'RobotoSlab-Medium';
 `

@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useRef } from 'react'
 import {
   KeyboardAvoidingView,
@@ -15,12 +13,12 @@ import { FormHandles } from '@unform/core'
 import * as Yup from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
 import ImagePicker from 'react-native-image-picker'
-
 import getValidationErrors from '../../utils/getValidationErrors'
 import api from '../../services/api'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
-
+import { useAuth } from '../../hooks/auth'
+import { ProfileFormData } from './types'
 import {
   Container,
   BackButton,
@@ -28,8 +26,6 @@ import {
   UserAvatarButton,
   UserAvatar,
 } from './styles'
-import { useAuth } from '../../hooks/auth'
-import { ProfileFormData } from './types'
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth()
@@ -128,9 +124,11 @@ const Profile: React.FC = () => {
           name: `${user.id}.jpg`,
           uri: updateAvatar.uri,
         })
-        api.patch('users/avatar', data).then(responseAvatar => {
-          updateUser(responseAvatar.data)
-        })
+        async function handleupdateAvatar() {
+          const response = await api.patch('users/avatar', data)
+          updateUser(response.data)
+        }
+        handleupdateAvatar()
       },
     )
   }, [user.id, updateUser])

@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { useCallback, useRef } from 'react'
 import {
   Image,
@@ -17,13 +13,12 @@ import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
 import * as Yup from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
-
-import { useAuth } from '../../hooks/auth'
 import getValidationErrors from '../../utils/getValidationErrors'
 import logoImg from '../../assets/logo.png'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
-
+import { useAuth } from '../../hooks/auth'
+import { SignInFormData } from './types'
 import {
   Container,
   Title,
@@ -33,15 +28,9 @@ import {
   CreateAccountButtonText,
 } from './styles'
 
-interface SignInFormData {
-  email: string
-  password: string
-}
-
 const SignIn: React.FC = () => {
   const { signIn } = useAuth()
-
-  const navigation = useNavigation()
+  const { navigate } = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const passwordInputRef = useRef<TextInput>(null)
 
@@ -125,13 +114,13 @@ const SignIn: React.FC = () => {
                 Entrar
               </Button>
             </Form>
-            <ForgotPassword onPress={() => {}}>
+            <ForgotPassword onPress={() => navigate('ForgotPassword')}>
               <ForgotPasswordText>Esqueci minha senha</ForgotPasswordText>
             </ForgotPassword>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
-      <CreateAccountButton onPress={() => navigation.navigate('SignUp')}>
+      <CreateAccountButton onPress={() => navigate('SignUp')}>
         <Icon name="log-in" size={20} color="#ff9000" />
         <CreateAccountButtonText>Criar uma conta</CreateAccountButtonText>
       </CreateAccountButton>

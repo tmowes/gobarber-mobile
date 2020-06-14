@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
@@ -10,7 +7,6 @@ import api from '../../services/api'
 import { Provider } from './types'
 import {
   Container,
-  Title,
   Header,
   HeaderTitle,
   UserName,
@@ -24,16 +20,13 @@ import {
   ProviderName,
   ProviderMeta,
   ProviderMetaText,
+  BackToSignInButton,
+  BackToSignInButtonText,
 } from './styles'
-
-interface SignInFormData {
-  email: string
-  password: string
-}
 
 const Dashboard: React.FC = () => {
   const [providers, setProviders] = useState<Provider[]>([])
-  const { signOut, user } = useAuth()
+  const { user, signOut } = useAuth()
   const { navigate } = useNavigation()
 
   useEffect(() => {
@@ -48,9 +41,13 @@ const Dashboard: React.FC = () => {
     navigate('Profile')
   }, [navigate])
 
+  const handleSignOut = useCallback(() => {
+    signOut()
+  }, [signOut])
+
   const navigateToCreateAppointment = useCallback(
-    (provider_id: string) => {
-      navigate('CreateAppointment', { provider_id })
+    (provider_id: string, providerName: string) => {
+      navigate('CreateAppointment', { provider_id, providerName })
     },
     [navigate],
   )
@@ -77,26 +74,34 @@ const Dashboard: React.FC = () => {
           keyExtractor={provider => provider.id}
           renderItem={({ item: provider }) => (
             <ProviderContainer
-              onPress={() => navigateToCreateAppointment(provider.id)}
+              onPress={() =>
+                navigateToCreateAppointment(provider.id, provider.name)
+              }
             >
               <ProviderAvatar source={{ uri: provider.avatar_url }} />
               <ProviderInfo>
                 <ProviderName>{provider.name}</ProviderName>
                 <ProviderMeta>
-                  <Icon name="calendar" size={14} color="#ff9000" />
+                  <Icon name="calendar" size={18} color="#ff9000" />
                   <ProviderMetaText>Segunda a Sexta</ProviderMetaText>
                 </ProviderMeta>
                 <ProviderMeta>
-                  <Icon name="clock" size={14} color="#ff9000" />
+                  <Icon name="clock" size={18} color="#ff9000" />
                   <ProviderMetaText>8:00 a 18:00</ProviderMetaText>
                 </ProviderMeta>
               </ProviderInfo>
             </ProviderContainer>
           )}
         />
-        <View>
-          <Title>DASHBORAD</Title>
-        </View>
+        <BackToSignInButton onPress={handleSignOut}>
+          <Icon
+            name="log-out"
+            size={20}
+            color="#f4ede8"
+            style={{ transform: [{ rotateY: '180deg' }] }}
+          />
+          <BackToSignInButtonText>Sair</BackToSignInButtonText>
+        </BackToSignInButton>
       </Container>
     </>
   )

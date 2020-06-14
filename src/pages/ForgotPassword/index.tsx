@@ -1,24 +1,24 @@
 import React, { useCallback, useRef } from 'react'
 import {
-  Image,
   KeyboardAvoidingView,
   ScrollView,
   View,
   Platform,
   TextInput,
   Alert,
+  Image,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
 import * as Yup from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
+import logoImg from '../../assets/logo.png'
 import getValidationErrors from '../../utils/getValidationErrors'
 import api from '../../services/api'
-import logoImg from '../../assets/logo.png'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
-import { SignUpFormData } from './types'
+import { ForgotPasswordFormData } from './types'
 import {
   Container,
   Title,
@@ -26,32 +26,28 @@ import {
   BackToSignInButtonText,
 } from './styles'
 
-const SignUp: React.FC = () => {
-  const { navigate, goBack } = useNavigation()
+const ForgotPassword: React.FC = () => {
+  const { goBack } = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const emailInputRef = useRef<TextInput>(null)
-  const passwordInputRef = useRef<TextInput>(null)
 
-  const handleSignUp = useCallback(
-    async (data: SignUpFormData) => {
+  const handleForgotPasswordRequest = useCallback(
+    async (data: ForgotPasswordFormData) => {
       try {
         formRef.current?.setErrors({})
         const schema = Yup.object().shape({
-          name: Yup.string().required('Nome obrigatório'),
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail valido'),
-          password: Yup.string().min(6, 'No minimo 6 digitos'),
         })
         await schema.validate(data, {
           abortEarly: false,
         })
-        await api.post('/users', data)
-        Alert.alert(
-          'Cadastro realizado com sucesso',
-          'Você já pode fazer login na aplicação',
-        )
-        navigate('SignIn')
+        await api.post('/password/forgot', {
+          email: data.email,
+        })
+        Alert.alert('E-mail de recuperação de senha enviado')
+        goBack()
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err)
@@ -59,12 +55,12 @@ const SignUp: React.FC = () => {
           return
         }
         Alert.alert(
-          'Erro no cadastro',
-          'Ocorreu um erro ao fazer o cadastro, tente novamente .',
+          'Erro na solicitação',
+          'Ocorreu um erro ao solicitar recuperação de senha, tente novamente .',
         )
       }
     },
-    [navigate],
+    [goBack],
   )
 
   const handleGoback = useCallback(() => {
@@ -85,19 +81,9 @@ const SignUp: React.FC = () => {
           <Container>
             <Image source={logoImg} />
             <View>
-              <Title>Crie sua conta</Title>
+              <Title>Recuperar Senha</Title>
             </View>
-            <Form ref={formRef} onSubmit={handleSignUp}>
-              <Input
-                autoCapitalize="words"
-                name="name"
-                placeholder="Nome"
-                icon="user"
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  emailInputRef.current?.focus()
-                }}
-              />
+            <Form ref={formRef} onSubmit={handleForgotPasswordRequest}>
               <Input
                 ref={emailInputRef}
                 autoCorrect={false}
@@ -106,18 +92,6 @@ const SignUp: React.FC = () => {
                 name="email"
                 placeholder="E-mail"
                 icon="mail"
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  passwordInputRef.current?.focus()
-                }}
-              />
-              <Input
-                ref={passwordInputRef}
-                secureTextEntry
-                name="password"
-                placeholder="Senha"
-                icon="lock"
-                textContentType="newPassword"
                 returnKeyType="send"
                 onSubmitEditing={() => {
                   formRef.current?.submitForm()
@@ -128,18 +102,18 @@ const SignUp: React.FC = () => {
                   formRef.current?.submitForm()
                 }}
               >
-                Cadastrar
+                Recuperar senha
               </Button>
             </Form>
           </Container>
+          <BackToSignInButton onPress={handleGoback}>
+            <Icon name="arrow-left" size={20} color="#f4ede8" />
+            <BackToSignInButtonText>Voltar para logon</BackToSignInButtonText>
+          </BackToSignInButton>
         </ScrollView>
       </KeyboardAvoidingView>
-      <BackToSignInButton onPress={handleGoback}>
-        <Icon name="arrow-left" size={20} color="#f4ede8" />
-        <BackToSignInButtonText>Voltar para logon</BackToSignInButtonText>
-      </BackToSignInButton>
     </>
   )
 }
 
-export default SignUp
+export default ForgotPassword

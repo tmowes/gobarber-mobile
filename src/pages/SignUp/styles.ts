@@ -9,7 +9,6 @@ export const Container = styled.View`
   padding: 0 30px;
   padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px;
 `
-
 export const Title = styled.Text`
   font-size: 24px;
   color: #f4ede8;
@@ -25,12 +24,10 @@ export const BackToSignInButton = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-
   border-top-width: 1px;
   border-color: #232129;
   padding: 16px 0 ${8 + getBottomSpace()}px;
 `
-
 export const BackToSignInButtonText = styled.Text`
   color: #f4ede8;
   font-size: 18px;

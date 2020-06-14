@@ -12,7 +12,7 @@ export const Title = styled.Text`
   font-size: 32px;
   font-family: 'RobotoSlab-Medium';
   text-align: center;
-  margin: 48px 0 16px;
+  margin: 32px 0 16px;
 `
 export const Description = styled.Text`
   color: #999591;

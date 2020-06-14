@@ -16,3 +16,11 @@ export interface HourProps {
 export interface HourTextProps {
   selected: boolean
 }
+export interface RouteParams {
+  provider_id: string
+  providerName: string
+}
+export interface AvailabilityItem {
+  hour: number
+  available: boolean
+}

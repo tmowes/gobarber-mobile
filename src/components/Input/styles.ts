@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import styled, { css } from 'styled-components/native'
 import FeatherIcon from 'react-native-vector-icons/Feather'
-
-interface ContainerProps {
-  isFocused: boolean
-  isErrored: boolean
-}
+import { ContainerProps } from './types'
 
 export const Container = styled.View<ContainerProps>`
   width: 100%;
@@ -18,7 +13,6 @@ export const Container = styled.View<ContainerProps>`
   justify-content: center;
   align-items: center;
   border-width: 2px;
-
   border-color: #232129;
   ${props =>
     props.isErrored &&
@@ -34,7 +28,6 @@ export const Container = styled.View<ContainerProps>`
 export const Icon = styled(FeatherIcon)`
   margin-right: 16px;
 `
-
 export const TextInput = styled.TextInput`
   flex: 1;
   color: #f4ede8;

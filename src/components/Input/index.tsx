@@ -1,7 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useState,
   useEffect,
@@ -10,24 +6,10 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react'
-import { TextInputProperties } from 'react-native'
 import { useField } from '@unform/core'
 
 import { Container, TextInput, Icon } from './styles'
-
-interface InputProps extends TextInputProperties {
-  name: string
-  icon: string
-  containerStyle?: {}
-}
-
-interface InputValueRefProps {
-  value: string
-}
-
-interface InputRef {
-  focus(): void
-}
+import { InputRef, InputValueRefProps, InputProps } from './types'
 
 const Input: React.RefForwardingComponent<InputRef, InputProps> = (
   { name, containerStyle = {}, icon, ...rest },
@@ -60,7 +42,7 @@ const Input: React.RefForwardingComponent<InputRef, InputProps> = (
       name: fieldName,
       ref: inputValueRef.current,
       path: 'value',
-      setValue(ref: any, value) {
+      setValue(_, value) {
         inputValueRef.current.value = value
         inputElementRef.current.setNativeProps({ text: value })
       },
