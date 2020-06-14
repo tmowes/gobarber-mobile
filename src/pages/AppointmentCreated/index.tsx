@@ -24,6 +24,8 @@ const AppointmentCreated: React.FC = () => {
     })
   }, [date])
 
+  //
+
   const formattedProviderName = useMemo(() => {
     return `com ${providerName}`
   }, [providerName])
