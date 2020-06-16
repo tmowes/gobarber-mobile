@@ -29,6 +29,8 @@ const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth()
   const { navigate } = useNavigation()
 
+  // TODO: list my schedule appointments sort by early date from today
+
   useEffect(() => {
     async function loadProviders() {
       const response = await api.get('providers')

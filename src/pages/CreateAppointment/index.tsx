@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { Platform, Alert } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/Feather'
-import { format } from 'date-fns'
+import { format, formatRelative, addDays } from 'date-fns'
 import { useRoute, useNavigation } from '@react-navigation/native'
 import ptBR from 'date-fns/locale/pt-BR'
 import { useAuth } from '../../hooks/auth'
@@ -22,7 +22,6 @@ import {
   ProviderName,
   ProviderContainer,
   Calendar,
-  Title,
   DateTitle,
   OpenDatePickerButton,
   OpenDatePickerText,
@@ -44,7 +43,7 @@ const CreateAppointment: React.FC = () => {
   const { user } = useAuth()
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const [selectedHour, setSelectedHour] = useState(0)
+  const [selectedHour, setSelectedHour] = useState(18)
   const [availability, setAvailability] = useState<AvailabilityItem[]>([])
   const [providers, setProviders] = useState<Provider[]>([])
   const [selectedProvider, setSelectedProvider] = useState(provider_id)
@@ -62,19 +61,22 @@ const CreateAppointment: React.FC = () => {
     async function loadDayAvailability() {
       const afterHours = selectedDate.getHours()
       if (afterHours >= 17) {
-        const tomorrow = new Date(Date.now() + 25200000)
+        const tomorrow = new Date(addDays(selectedDate.setMinutes(0), 1))
         setSelectedDate(tomorrow)
+        setSelectedHour(8)
       }
       const invalidAppointmentDate = format(selectedDate, 'eeee', {
         locale: ptBR,
       })
       if (invalidAppointmentDate === 'domingo') {
-        const nextMonday = new Date(selectedDate.getTime() + 86400000)
+        const nextMonday = new Date(addDays(selectedDate.setMinutes(0), 1))
         setSelectedDate(nextMonday)
+        setSelectedHour(8)
       }
       if (invalidAppointmentDate === 'sábado') {
-        const nextMonday = new Date(selectedDate.getTime() + 86400000 * 2)
+        const nextMonday = new Date(addDays(selectedDate.setMinutes(0), 2))
         setSelectedDate(nextMonday)
+        setSelectedHour(8)
       }
       const response = await api.get(
         `providers/${selectedProvider}/day-availability`,
@@ -181,6 +183,16 @@ const CreateAppointment: React.FC = () => {
     })
   }, [selectedDate])
 
+  const dateParsed = useMemo(() => {
+    return formatRelative(
+      new Date(selectedDate.setHours(selectedHour)),
+      new Date(),
+      {
+        locale: ptBR,
+      },
+    )
+  }, [selectedDate, selectedHour])
+
   return (
     <>
       <Container>
@@ -216,8 +228,8 @@ const CreateAppointment: React.FC = () => {
             />
           </ProvidersListContainer>
           <Calendar>
-            <Title>Data selecionada</Title>
             <DateTitle>{formattedDate}</DateTitle>
+            <DateTitle>{dateParsed}</DateTitle>
             <OpenDatePickerButton onPress={handleToggleDatePicker}>
               <OpenDatePickerText>Selecionar outra data</OpenDatePickerText>
             </OpenDatePickerButton>
