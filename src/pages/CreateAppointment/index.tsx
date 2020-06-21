@@ -51,8 +51,8 @@ const CreateAppointment: React.FC = () => {
 
   useEffect(() => {
     async function loadProviders() {
-      const response = await api.get('providers')
-      setProviders(response.data)
+      const { data } = await api.get('providers')
+      setProviders(data)
     }
     loadProviders()
   }, [selectedDate])
@@ -78,7 +78,7 @@ const CreateAppointment: React.FC = () => {
         setSelectedDate(nextMonday)
         setSelectedHour(8)
       }
-      const response = await api.get(
+      const { data } = await api.get(
         `providers/${selectedProvider}/day-availability`,
         {
           params: {
@@ -88,7 +88,7 @@ const CreateAppointment: React.FC = () => {
           },
         },
       )
-      setAvailability(response.data)
+      setAvailability(data)
     }
     loadDayAvailability()
   }, [selectedDate, selectedProvider])
