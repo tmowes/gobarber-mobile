@@ -1,8 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { Platform, Alert } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/Feather'
-import { format, formatRelative, addDays } from 'date-fns'
+import {
+  format,
+  formatRelative,
+  addDays,
+  parseISO,
+  startOfHour,
+  addHours,
+  isSunday,
+  isSaturday,
+  isBefore,
+  isToday,
+} from 'date-fns'
 import { useRoute, useNavigation } from '@react-navigation/native'
 import ptBR from 'date-fns/locale/pt-BR'
 import { useAuth } from '../../hooks/auth'
@@ -43,12 +55,37 @@ const CreateAppointment: React.FC = () => {
   const { user } = useAuth()
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const [selectedHour, setSelectedHour] = useState(18)
+  const [selectedHour, setSelectedHour] = useState(0)
   const [availability, setAvailability] = useState<AvailabilityItem[]>([])
   const [providers, setProviders] = useState<Provider[]>([])
   const [selectedProvider, setSelectedProvider] = useState(provider_id)
   const [selectedProviderName, setSelectedProviderName] = useState(providerName)
+  const [offsetHours, setOffsetHours] = useState(0)
+  const [localHours, setLocalHours] = useState(0)
 
+  /* CARREGA HORA LOCAL / HORA UTC */
+  useEffect(() => {
+    async function loadLocalTime() {
+      const dateISO = addHours(startOfHour(new Date()), 1).toISOString()
+      // console.log('dateUTC', dateISO)
+      const hourUTC = new Date(dateISO).getUTCHours()
+      // console.log('hourUTC', hourUTC)
+      const dateLocal = addHours(startOfHour(new Date()), 1).toString()
+      // console.log('dateLocal', dateLocal)
+      const hourLocal = new Date(dateLocal).getHours()
+      // console.log('hourLocal', hourLocal)
+      setSelectedDate(new Date(dateLocal))
+      setSelectedHour(hourLocal)
+      setLocalHours(hourLocal)
+      const timeDiff =
+        new Date(dateLocal).getHours() - new Date(dateISO).getUTCHours()
+      // console.log('timeDiff', timeDiff)
+      setOffsetHours(timeDiff)
+    }
+    loadLocalTime()
+  }, [])
+
+  /* CARREGA PRESTADORES */
   useEffect(() => {
     async function loadProviders() {
       const { data } = await api.get('providers')
@@ -57,28 +94,28 @@ const CreateAppointment: React.FC = () => {
     loadProviders()
   }, [selectedDate])
 
+  /* CARREGA HORÁRIOS DISPONÍVEIS */
   useEffect(() => {
     async function loadDayAvailability() {
-      const afterHours = selectedDate.getHours()
-      if (afterHours >= 17) {
-        const tomorrow = new Date(addDays(selectedDate.setMinutes(0), 1))
-        setSelectedDate(tomorrow)
+      if (selectedDate.getHours() > 17) {
+        setSelectedDate(
+          new Date(addDays(startOfHour(addHours(selectedDate, 1)), 1)),
+        )
         setSelectedHour(8)
       }
-      const invalidAppointmentDate = format(selectedDate, 'eeee', {
-        locale: ptBR,
-      })
-      if (invalidAppointmentDate === 'domingo') {
-        const nextMonday = new Date(addDays(selectedDate.setMinutes(0), 1))
-        setSelectedDate(nextMonday)
+      if (isSunday(selectedDate)) {
+        setSelectedDate(
+          new Date(addDays(addHours(startOfHour(selectedDate), 1), 1)),
+        )
         setSelectedHour(8)
       }
-      if (invalidAppointmentDate === 'sábado') {
-        const nextMonday = new Date(addDays(selectedDate.setMinutes(0), 2))
-        setSelectedDate(nextMonday)
+      if (isSaturday(selectedDate)) {
+        setSelectedDate(
+          new Date(addDays(addHours(startOfHour(selectedDate), 1), 2)),
+        )
         setSelectedHour(8)
       }
-      const { data } = await api.get(
+      const { data } = await api.get<AvailabilityItem[]>(
         `providers/${selectedProvider}/day-availability`,
         {
           params: {
@@ -88,10 +125,39 @@ const CreateAppointment: React.FC = () => {
           },
         },
       )
-      setAvailability(data)
+      if (isToday(selectedDate)) {
+        const fixTodayAvailability = data
+          .filter(({ hour }) => hour < localHours)
+          .map(({ hour }) => {
+            return {
+              hour,
+              available: false,
+              hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+            }
+          })
+        const todayAvailability = data
+          .filter(({ hour }) => hour >= localHours)
+          .map(({ hour, available }) => {
+            return {
+              hour,
+              available,
+              hourFormatted: format(new Date().setHours(hour), 'HH:00'),
+            }
+          })
+        const fixedAvailability = [
+          ...todayAvailability,
+          ...fixTodayAvailability,
+        ].sort(
+          (AvailabilityA, AvailabilityB) =>
+            AvailabilityA.hour - AvailabilityB.hour,
+        )
+        setAvailability(fixedAvailability)
+      } else {
+        setAvailability(data)
+      }
     }
     loadDayAvailability()
-  }, [selectedDate, selectedProvider])
+  }, [localHours, selectedDate, selectedProvider])
 
   const navigateBack = useCallback(() => {
     goBack()
@@ -108,7 +174,7 @@ const CreateAppointment: React.FC = () => {
     },
     [],
   )
-
+  /* SELETOR DE HORA DISPONIVEL */
   const handleSelectHour = useCallback((hour: number) => {
     setSelectedHour(hour)
   }, [])
@@ -117,6 +183,7 @@ const CreateAppointment: React.FC = () => {
     setShowDatePicker(state => !state)
   }, [])
 
+  /* SELETOR DE DATA DISPONIVEL */
   const handleDateChanged = useCallback(
     (event: any, date: Date | undefined) => {
       if (Platform.OS === 'android') {
@@ -132,14 +199,22 @@ const CreateAppointment: React.FC = () => {
   const handleCreateAppointment = useCallback(async () => {
     try {
       const date = new Date(selectedDate)
-      date.setHours(selectedHour)
+      date.setUTCHours(selectedHour)
       date.setMinutes(0)
-      await api.post('appointments', { provider_id: selectedProvider, date })
+      // console.log('date', date)
+      const appointmentDate = new Date(date)
+      appointmentDate.setHours(selectedHour)
+      // console.log('appointmentDate', appointmentDate)
+      await api.post('appointments', {
+        provider_id: selectedProvider,
+        date,
+      })
       navigate('AppointmentCreated', {
-        date: date.getTime(),
+        date: appointmentDate.getTime(),
         providerName: selectedProviderName,
       })
     } catch (err) {
+      // console.log('err', err)
       Alert.alert(
         'Erro ao criar o agendamento',
         'Ocorreu um erro ao criar o agendamento, tente novamente.',

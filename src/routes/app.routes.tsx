@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import Dashboard from '../pages/Dashboard'
+import ListAppointments from '../pages/ListAppointments'
 import Profile from '../pages/Profile'
 import CreateAppointment from '../pages/CreateAppointment'
 import AppointmentCreated from '../pages/AppointmentCreated'
@@ -15,6 +17,7 @@ const AppRoutes: React.FC = () => (
         cardStyle: { backgroundColor: '#312e38' },
       }}
     >
+      {/* <App.Screen name="ListAppointments" component={ListAppointments} /> */}
       <App.Screen name="Dashboard" component={Dashboard} />
       <App.Screen name="CreateAppointment" component={CreateAppointment} />
       <App.Screen name="AppointmentCreated" component={AppointmentCreated} />
